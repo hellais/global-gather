@@ -65,9 +65,6 @@ def make_destination_df(df_passport_index, df_safety_crime, df_participants):
     df_scores['country_name'] = df_scores['alpha_2'].apply(get_country_name)
     return df_scores.merge(df_safety_crime, how='left', on='alpha_2')
 
-if 'df_scores' not in st.session_state:
-    st.session_state['df_scores'] = None
-
 data_load_state = st.markdown('**Loading data...**')
 df_safety_crime = load_safety_crime()
 
@@ -87,17 +84,13 @@ Populate the table below with your participant list and then click calculate des
 
 edited_df = st.data_editor(df_participant_list, num_rows="dynamic")
 
-def calculate_score():
-    st.session_state.df_scores = make_destination_df(
+if st.button('Calculate passport index'):
+    df_scores = make_destination_df(
             df_passport_index=df_passport_index,
             df_safety_crime=df_safety_crime,
             df_participants=edited_df
     )
-
-st.button('Calculate passport index', on_click=calculate_score)
-
-if st.session_state.df_scores is not None:
-    st.write(st.session_state.df_scores)
+    st.write(df_scores)
 
 if st.checkbox('Show passport index'):
     st.subheader('Passport index')
