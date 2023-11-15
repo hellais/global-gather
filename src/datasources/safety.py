@@ -313,6 +313,6 @@ def get_safety_crime_index():
             'safety_index': safety_val,
             'raw_name': raw_name,
             'name': name,
-            'alpha2': alpha2
+            'alpha_2': alpha2
         })
     return safety_crime_index

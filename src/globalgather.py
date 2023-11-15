@@ -26,7 +26,7 @@ def get_country_name(alpha_2):
         return cc.name
     return ''
 
-def make_destination_df(df_passport_index, df_participants):
+def make_destination_df(df_passport_index, df_safety_crime, df_participants):
     good_values = [
         '7-360',
         'visa free',
@@ -58,19 +58,18 @@ def make_destination_df(df_passport_index, df_participants):
         for ok_cc in ok_cc_set:
             ok_count += src_cc_list.count(ok_cc)
         ok_list.append(
-            {'visa_free_count': ok_count, 'country_code': dst_cc}
+            {'visa_free_count': ok_count, 'alpha_2': dst_cc}
         )
 
     df_scores = pd.DataFrame(ok_list)
-    df_scores['country_name'] = df_scores['country_code'].apply(get_country_name)
-    return df_scores
+    df_scores['country_name'] = df_scores['alpha_2'].apply(get_country_name)
+    return df_scores.merge(df_safety_crime, how='left', on='alpha_2')
 
 if 'df_scores' not in st.session_state:
     st.session_state['df_scores'] = None
 
-data_load_state = st.text('Loading data...')
-data = load_safety_crime()
-data_load_state.text("Done! (using st.cache_data)")
+data_load_state = st.markdown('**Loading data...**')
+df_safety_crime = load_safety_crime()
 
 df_passport_index = load_passport_index()
 df_participant_list = pd.DataFrame(
@@ -78,13 +77,24 @@ df_participant_list = pd.DataFrame(
         {"name": "Jane Doe", "alpha_2": "IT"},
     ]
 )
+data_load_state.markdown("""
+**Loaded!**
+
+Populate the table below with your participant list and then click calculate destination scores to get the list of possible destinations.
+
+**pro-tip**: you can copy paste the participant list from a spreadsheet
+""")
 
 edited_df = st.data_editor(df_participant_list, num_rows="dynamic")
 
-def calculate_score(name):
-    st.session_state.df_scores = make_destination_df(df_passport_index, edited_df)
+def calculate_score():
+    st.session_state.df_scores = make_destination_df(
+            df_passport_index=df_passport_index,
+            df_safety_crime=df_safety_crime,
+            df_participants=edited_df
+    )
 
-st.button('Calculate passport index', on_click=calculate_score, args=[''])
+st.button('Calculate passport index', on_click=calculate_score)
 
 if st.session_state.df_scores is not None:
     st.write(st.session_state.df_scores)
