@@ -84,7 +84,7 @@ Populate the table below with your participant list and then click calculate des
 
 edited_df = st.data_editor(df_participant_list, num_rows="dynamic")
 
-if st.button('Calculate passport index'):
+if st.button('Calculate destination scores'):
     df_scores = make_destination_df(
             df_passport_index=df_passport_index,
             df_safety_crime=df_safety_crime,
