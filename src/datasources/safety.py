@@ -298,13 +298,13 @@ def get_safety_crime_index():
             name = cc.name
             alpha2 = cc.alpha_2
         except:
-            print(f"FAIL {raw_name}")
+            #print(f"FAIL {raw_name}")
             try:
                 cc = pycountry.countries.search_fuzzy(raw_name)
                 name = cc[0].name
                 alpha2 = cc[0].alpha_2
             except:
-                print(f"HARDFAIL {raw_name}")
+                #print(f"HARDFAIL {raw_name}")
                 name = "Unknown"
                 alpha2 = "ZZ"
 
